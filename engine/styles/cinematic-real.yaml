@@ -1,0 +1,242 @@
+# 🧱 风格引擎 — 真人电影类风格预设（8种）
+
+每个风格预设包含：光影方案、镜头规格、质感描述、色彩板。
+使用时直接复制参数块注入 Seedance / Image2 提示词。
+
+---
+
+## 1. 真人电影感写实风格
+
+```yaml
+style: 真人电影感写实
+lighting:
+  primary: "45° 暖金主光源，柔和自然散射"
+  secondary: "环境反射补光，避免死黑"
+  ambient: "自然日光或暖色室内光"
+  mood: "电影级明暗过渡，柔和阴影，不死硬"
+lens:
+  type: "85mm 变形宽银幕"
+  aperture: "f/1.8"
+  dof: "浅景深，焦点锐利，焦外柔美"
+  resolution: "8K 超清"
+texture:
+  skin: "超写实人体皮肤肌理，精细毛孔，面部细软绒毛，次表面散射"
+  fabric: "天然面料纹理可见（棉麻丝毛）"
+  environment: "自然材质老化痕迹（木纹/石纹/锈迹）"
+palette:
+  primary: "自然肤色 / 中性灰"
+  secondary: "环境固有色"
+  accent: "道具或服装点缀色"
+negative: "模糊、低画质、面部变形、多余手指、水印、过度锐化、塑料感皮肤"
+```
+
+---
+
+## 2. 真人自然主义纪实风格
+
+```yaml
+style: 真人自然主义纪实
+lighting:
+  primary: "自然光为主，避免人工补光痕迹"
+  secondary: "环境漫反射"
+  ambient: "真实场景光线（阴天柔光/窗光/街灯）"
+  mood: "不修饰的粗粝感，保留高光过曝和暗部噪点"
+lens:
+  type: "35mm 或 50mm 纪实镜头"
+  aperture: "f/2.8-f/4"
+  dof: "中景深，环境信息保留"
+  resolution: "4K-8K，轻微胶片颗粒"
+texture:
+  skin: "真实皮肤质感，不磨皮，保留瑕疵、毛孔、细纹"
+  fabric: "日常衣物自然褶皱和磨损"
+  environment: "真实环境不做美化处理"
+palette:
+  primary: "环境主色调直出"
+  secondary: "不进行后期调色偏移"
+  accent: "自然色彩"
+negative: "过度磨皮、糖水色调、影楼打光、塑料感、不自然的色彩饱和度"
+```
+
+---
+
+## 3. 真人商业广告质感
+
+```yaml
+style: 真人商业广告质感
+lighting:
+  primary: "多灯精准布光，产品/人物高光区锐利明亮"
+  secondary: "精确控光消除多余阴影"
+  ambient: "干净的高调或低调棚拍光"
+  mood: "无瑕、高级、精致，每一道光都有意图"
+lens:
+  type: "100mm 微距或 85mm 人像镜"
+  aperture: "f/1.4-f/2.8"
+  dof: "极浅景深，背景奶油化开"
+  resolution: "8K 超清，零噪点"
+texture:
+  skin: "专业级修图质感，无瑕但保留皮肤纹理走向"
+  fabric: "高定面料光泽与纹理，丝绸/皮革/精纺羊毛"
+  product: "无尘无痕，金属高光笔直，玻璃透亮无折射畸变"
+palette:
+  primary: "品牌主色或产品色"
+  secondary: "高级灰/白/黑背景"
+  accent: "金属光泽点缀（金/银/玫瑰金）"
+negative: "噪点、灰尘、不自然的色彩偏移、曝光不准、边缘模糊"
+```
+
+---
+
+## 4. 真人低调光悬疑风格
+
+```yaml
+style: 真人低调光悬疑
+lighting:
+  primary: "单一硬光源，方向明确（窗光/手电/路灯）"
+  secondary: "几乎无补光，大面暗部"
+  ambient: "极弱环境光，暗部细节勉强可辨"
+  mood: "压抑、紧张、未知，阴影吞噬大部分画面"
+lens:
+  type: "50mm 或 85mm"
+  aperture: "f/1.4-f/2.0"
+  dof: "浅景深，焦点孤立主体于黑暗中"
+  resolution: "8K，暗部保留纹理不糊成一片"
+texture:
+  skin: "汗水反光、惊恐时的毛孔收缩、局部冷光勾勒轮廓"
+  fabric: "深色衣物融入暗部"
+  environment: "潮湿反光表面、灰尘在光束中悬浮"
+palette:
+  primary: "深黑 / 深灰蓝"
+  secondary: "冷白或暖黄单点光"
+  accent: "危险红 / 幽绿 / 警示橙（极少使用）"
+negative: "画面过亮、均匀布光、清晰可见的面部、明亮背景"
+```
+
+---
+
+## 5. 真人黑色电影风格
+
+```yaml
+style: 真人黑色电影
+lighting:
+  primary: "硬质单光源，百叶窗投影或街灯光束"
+  secondary: "无"
+  ambient: "极暗，烟雾弥漫捕捉光束体积"
+  mood: "宿命感、道德灰色地带、1940s好莱坞犯罪片美学"
+lens:
+  type: "50mm 或 35mm 黑白时代镜头质感"
+  aperture: "f/2.0-f/2.8"
+  dof: "中浅景深"
+  resolution: "4K-8K，添加细微胶片颗粒"
+texture:
+  skin: "高对比度，亮部死白、暗部死黑，少量灰度过渡"
+  fabric: "风衣、礼帽、西装廓形，面料质感被明暗切割"
+  environment: "湿漉漉的街道、霓虹倒影、烟雾缭绕的室内"
+palette:
+  primary: "黑白为主，极少量单色点缀"
+  secondary: "深灰到纯黑渐变"
+  accent: "危险红唇 / 霓虹蓝 / 琥珀酒色（非常克制）"
+negative: "彩色、柔和布光、明亮白天外景、过度锐利"
+```
+
+---
+
+## 6. 真人霓虹赛博风格
+
+```yaml
+style: 真人霓虹赛博朋克
+lighting:
+  primary: "多色霓虹灯管（品红/青蓝/明黄）从画面各处射入"
+  secondary: "LED 屏幕和全息投影的漫射光"
+  ambient: "湿雾弥漫，光线在水汽中形成体积光束"
+  mood: "高科技低生活，繁华与衰败并存，颓废美学"
+lens:
+  type: "35mm 或 50mm，宽幅变形镜头"
+  aperture: "f/1.8-f/2.8"
+  dof: "中浅景深，夜景散景呈霓虹光斑"
+  resolution: "8K"
+texture:
+  skin: "汗湿反光，皮肤被霓虹染成粉紫/青蓝色调"
+  fabric: "合成材料（PVC/乳胶/机能面料）反光，透明雨衣"
+  environment: "湿滑街道反射霓虹、全息广告牌、裸露管道和电缆"
+palette:
+  primary: "品红 #FF0040"
+  secondary: "青蓝 #00D4FF"
+  accent: "明黄 #FFD700 / 墨绿 / 深紫"
+negative: "自然日光、田园风光、温暖色调、干净整洁的场景"
+```
+
+---
+
+## 7. 真人复古胶片风格
+
+```yaml
+style: 真人复古胶片
+lighting:
+  primary: "自然光或钨丝灯暖光"
+  secondary: "轻微漏光效果"
+  ambient: "暖黄或褪色基调"
+  mood: "怀旧、温暖、时光感，1970-90年代家庭影像质感"
+lens:
+  type: "50mm 或 35mm vintage lens"
+  aperture: "f/2.8-f/4"
+  dof: "中景深"
+  resolution: "4K + 胶片颗粒 + 轻微色散/紫边"
+texture:
+  overall: "可见胶片颗粒，轻微划痕和灰尘斑点，边缘暗角"
+  skin: "暖调肤色，轻微过曝倾向"
+  fabric: "复古面料图案（格纹/碎花/灯芯绒）"
+  environment: "旧家具、褪色墙纸、日光漂白的窗帘"
+palette:
+  primary: "暖黄 / 褪色橙 / 奶油白"
+  secondary: "橄榄绿 / 棕褐"
+  accent: "柯达 Portra 400 调色板"
+negative: "过度锐利、数字感画面、冷色调、完美无瑕"
+```
+
+---
+
+## 8. 真人超现实电影风格
+
+```yaml
+style: 真人超现实电影
+lighting:
+  primary: "非自然光源逻辑，光线可违反物理"
+  secondary: "物体自发光、漂浮光球、光瀑倒流"
+  ambient: "梦境逻辑——天空可以是任何颜色"
+  mood: "诡异、梦幻、颠覆现实物理法则"
+lens:
+  type: "广角变形或鱼眼，扭曲透视"
+  aperture: "f/2.0-f/5.6"
+  dof: "深景深或极端浅景深，根据梦境需求切换"
+  resolution: "8K"
+texture:
+  skin: "可异化——瓷器质感、液态金属、半透明、裂痕"
+  fabric: "违反重力的飘浮布料、无限延伸的纹理"
+  environment: "埃舍尔式空间、无限循环楼梯、漂浮岛屿、倒置城市"
+palette:
+  primary: "超饱和或彻底去饱和，根据梦境基调"
+  secondary: "不限于物理色彩——紫色天空/金色海洋/黑白人物+彩色环境"
+  accent: "荧光色点缀"
+negative: "物理正确、日常场景、常规透视、自然色彩平衡"
+```
+
+---
+
+## 风格速选决策树
+
+```
+你的项目是什么类型？
+├── 现实题材
+│   ├── 追求艺术感 → 1.电影感写实
+│   ├── 追求真实感 → 2.自然主义纪实
+│   └── 产品/品牌 → 3.商业广告质感
+├── 悬疑/犯罪
+│   ├── 现代惊悚 → 4.低调光悬疑
+│   └── 复古犯罪 → 5.黑色电影
+├── 科幻/未来
+│   └── 赛博朋克 → 6.霓虹赛博
+├── 怀旧/年代
+│   └── 70-90年代感 → 7.复古胶片
+└── 梦境/实验
+    └── 打破规则 → 8.超现实电影
+```

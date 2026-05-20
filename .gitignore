@@ -1,0 +1,24 @@
+# AIGC 提示词操作系统 — 本地开发环境
+# 忽略系统文件和编辑器临时文件
+
+# Windows
+Thumbs.db
+desktop.ini
+*.tmp
+~$*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 环境
+.env
+.env.local

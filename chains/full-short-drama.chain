@@ -1,0 +1,147 @@
+# ⛓️ 端到端 Prompt Chain — 完整短剧生产线
+
+## 使用方式
+在 OpenClaw 中依次发送以下 Prompt。每条 Prompt 的输出作为下一条的输入。
+
+---
+
+## Chain Step 1：剧本生成/输入
+
+```
+你是一位AI短剧编剧。请根据以下设定生成一集短剧剧本：
+
+类型：[从 knowledge/genre-guide.md 选择]
+风格：[从 engine/styles/ 选择]
+目标时长：30秒
+核心冲突：[一句话描述]
+角色设定：[主角/配角/反派简述]
+
+输出格式：
+【标题】
+【角色】角色A: [简述] | 角色B: [简述]
+【正文】
+（完整剧本，包含场景描述、动作描述、台词、音效标注）
+【时长】预估 XX 秒
+
+要求：
+- 前3秒必须有视觉钩子
+- 每15秒一个信息增量
+- 动作描述是具体的物理动作
+- 结尾留悬念钩子
+```
+
+---
+
+## Chain Step 2：剧本审核
+
+```
+[将 Step 1 输出的剧本粘贴在此]
+
+请根据 pipeline/01-script-review.md 的要求，
+对以上剧本进行结构化质量审核。
+输出完整的审核报告。
+```
+
+---
+
+## Chain Step 3：角色设定图生成
+
+```
+[将审核通过的剧本粘贴在此]
+
+请根据 pipeline/03-character-design.md 的要求，
+为剧中主要角色生成三视图提示词。
+风格：[从 engine/styles/ 选择]
+皮肤质感：[从 engine/textures/ 选择]
+画幅：16:9 纯白背景
+角色不持任何武器道具。
+```
+
+---
+
+## Chain Step 4：场景设定图生成
+
+```
+[将剧本粘贴在此]
+
+请根据 pipeline/04-scene-design.md 的要求，
+为剧中主要场景生成设定图提示词。
+风格：[同上]
+光影方案：[从 engine/lighting/ 选择]
+画幅：16:9
+```
+
+---
+
+## Chain Step 5：道具设定图生成（如有）
+
+```
+[将剧本和角色/场景信息粘贴在此]
+
+请根据 pipeline/05-prop-design.md 的要求，
+为剧中关键道具生成设定图提示词。
+风格：[同上]
+画幅：9:16 纯深灰背景（单体）/ 16:9（三视图）
+```
+
+---
+
+## Chain Step 6：剧本转分镜
+
+```
+[将审核通过的剧本 + 角色/场景/道具信息粘贴在此]
+
+请根据 pipeline/02-script-to-storyboard.md 的要求，
+将以上剧本拆解为分镜序列。
+标注每个 Cut 的 @Image 引用。
+```
+
+---
+
+## Chain Step 7：Seedance 多镜头提示词
+
+```
+[将分镜脚本粘贴在此]
+
+请根据 pipeline/06-seedance-prompt.md 和 pipeline/07-multi-shot-narrative.md 的要求，
+将以上分镜脚本组装为 Seedance 2.0 多镜头叙事提示词。
+
+角色引用：
+- @Image1: 角色A三视图
+- @Image2: 角色B三视图
+- @Image3: 场景设定图
+- @Image4: 道具设定图（如有）
+
+统一参数：
+风格：[从 engine/styles/ 选择]
+光影：[从 engine/lighting/ 选择]
+镜头：[从 engine/lenses/ 选择]
+画幅：9:16
+```
+
+---
+
+## Chain Step 8：后期合成方案
+
+```
+[将生成的视频片段清单粘贴在此]
+
+请根据 pipeline/08-post-production.md 的要求，
+提供后期合成方案：
+- 粗剪时间轴
+- 转场方案
+- 音效分层
+- 字幕方案
+- 输出规格（抖音竖屏）
+```
+
+---
+
+## 快速启动命令
+
+```
+// 在 OpenClaw 中一次性加载框架
+请先阅读 \\192.168.1.100\aigc\prompt-framework\README.md，
+然后跟随 chains/full-short-drama.chain 开始短剧创作。
+我的需求是：[你的需求描述]
+```

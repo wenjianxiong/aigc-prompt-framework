@@ -1,0 +1,84 @@
+{
+  "framework": "AIGC影视提示词操作系统",
+  "version": "1.0.0",
+  "created": "2026-05-20",
+  "author": "小赵",
+  "description": "为AI短剧、漫剧、电影短篇和实验影像提供生产级的可加载提示词框架",
+
+  "layers": {
+    "engine": {
+      "description": "底层风格引擎——光影/镜头/质感/风格参数库",
+      "styles": [
+        { "file": "engine/styles/cinematic-real.yaml", "name": "真人电影类风格", "count": 8, "types": ["电影感写实","自然主义纪实","商业广告","低调光悬疑","黑色电影","霓虹赛博","复古胶片","超现实电影"] },
+        { "file": "engine/styles/animation.yaml", "name": "动画类风格", "count": 10, "types": ["3D写实","3D卡通","3D黏土","2D手绘","2D扁平","日系动画","国风动画","欧美卡通","绘本动画","定格动画"] }
+      ],
+      "lighting": [
+        { "file": "engine/lighting/lighting-presets.yaml", "count": 12, "types": ["伦勃朗布光","黄金时刻","蓝调时刻","阴天柔光","硬日光","赛博霓虹","烛光火光","月光","无影冷白","舞台追光","逆光剪影","废土苍凉"] }
+      ],
+      "lenses": [
+        { "file": "engine/lenses/lens-presets.yaml", "count": 7, "types": ["85mm变形宽银幕","35mm纪实","超广角","100mm微距","航拍俯瞰","手持跟拍","鱼眼"] }
+      ],
+      "textures": [
+        { "file": "engine/textures/texture-library.yaml", "categories": ["皮肤","金属","布料","自然环境","特殊质感"], "entries": 22 }
+      ]
+    },
+    "pipeline": {
+      "description": "中层生产管线——8个独立Skill",
+      "skills": [
+        { "file": "pipeline/01-script-review.md", "name": "剧本审核与质量检验", "input": "剧本全文", "output": "审核报告" },
+        { "file": "pipeline/02-script-to-storyboard.md", "name": "剧本转分镜", "input": "审核通过的剧本", "output": "分镜序列" },
+        { "file": "pipeline/03-character-design.md", "name": "角色设定（三视图）", "input": "角色描述", "output": "三视图提示词" },
+        { "file": "pipeline/04-scene-design.md", "name": "场景概念图", "input": "场景描述", "output": "场景设定图提示词" },
+        { "file": "pipeline/05-prop-design.md", "name": "道具特写", "input": "道具描述", "output": "道具设定图提示词" },
+        { "file": "pipeline/06-seedance-prompt.md", "name": "Seedance提示词组装", "input": "分镜脚本+素材", "output": "Seedance提示词" },
+        { "file": "pipeline/07-multi-shot-narrative.md", "name": "多镜头叙事编排", "input": "分镜序列", "output": "多镜头叙事提示词" },
+        { "file": "pipeline/08-post-production.md", "name": "后期合成指南", "input": "视频片段清单", "output": "后期方案" }
+      ]
+    },
+    "templates": {
+      "description": "顶层一键模板——面向最终创作者",
+      "entries": [
+        { "file": "templates/short-drama.prompt", "name": "短剧", "platform": "抖音/快手", "ratio": "9:16", "duration": "30-90s" },
+        { "file": "templates/manga-drama.prompt", "name": "漫剧", "platform": "B站/抖音", "ratio": "16:9或9:16", "duration": "1-5min" },
+        { "file": "templates/film-short.prompt", "name": "电影短篇", "platform": "电影节/B站/YouTube", "ratio": "16:9", "duration": "3-15min" },
+        { "file": "templates/ad-spot.prompt", "name": "广告短片", "platform": "抖音/朋友圈", "ratio": "任意", "duration": "15-30s" },
+        { "file": "templates/experimental.prompt", "name": "实验影像", "platform": "电影节/美术馆", "ratio": "任意", "duration": "30s-10min" }
+      ]
+    }
+  },
+
+  "knowledge": {
+    "description": "知识库——速查指南+实战案例",
+    "guides": [
+      { "file": "knowledge/seedance-guide.md", "name": "Seedance 2.0 完整参数速查" },
+      { "file": "knowledge/cost-guide.md", "name": "成本优化指南" },
+      { "file": "knowledge/genre-guide.md", "name": "14种故事类型创作要点" }
+    ],
+    "caseStudies": [
+      { "file": "knowledge/case-studies/wasteland-fight.md", "name": "废土刺杀——完整管线复盘" },
+      { "file": "knowledge/case-studies/xianxia-duel.md", "name": "古庙仙侠对峙——风格引擎复用" },
+      { "file": "knowledge/case-studies/xianzun-delivery/", "name": "仙尊外卖——完整8步链产出（含剧本/审核/角色/场景/道具/分镜/Seedance/后期）", "steps": 8 }
+    ]
+  },
+
+  "chains": {
+    "description": "端到端Prompt Chain——在OpenClaw中依次发送",
+    "entries": [
+      { "file": "chains/full-short-drama.chain", "name": "完整短剧生产线", "steps": 8 },
+      { "file": "chains/full-manga.chain", "name": "完整漫剧生产线", "steps": 7 },
+      { "file": "chains/full-film.chain", "name": "完整电影短篇生产线", "steps": 7 }
+    ]
+  },
+
+  "external_references": {
+    "description": "引用的外部资产（不复制，只索引）",
+    "assets": [
+      { "path": "\\\\192.168.1.100\\aigc\\提示词模板\\05剧本转分镜脚本Skill_v1.1.txt", "role": "分镜Skill源文件" },
+      { "path": "\\\\192.168.1.100\\aigc\\提示词模板\\06AI提示词编写完全指南_v2.0.docx", "role": "提示词教材源文件" },
+      { "path": "\\\\192.168.1.100\\aigc\\提示词模板\\07OpenClaw即梦AIGC视频工作流_v1.0.docx", "role": "工作流源文件" },
+      { "path": "\\\\192.168.1.100\\aigc\\提示词模板\\08剧本审核与质量检验Skill_v1.0.txt", "role": "审核Skill源文件" },
+      { "path": "\\\\192.168.1.100\\aigc\\漫剧教材\\", "role": "10章教材" },
+      { "path": "\\\\192.168.1.100\\aigc\\AI漫剧\\", "role": "实战项目" }
+    ]
+  }
+}
