@@ -52,7 +52,9 @@
     "guides": [
       { "file": "knowledge/seedance-guide.md", "name": "Seedance 2.0 完整参数速查" },
       { "file": "knowledge/cost-guide.md", "name": "成本优化指南" },
-      { "file": "knowledge/genre-guide.md", "name": "14种故事类型创作要点" }
+      { "file": "knowledge/genre-guide.md", "name": "14种故事类型创作要点" },
+      { "file": "knowledge/series-workflow.md", "name": "短剧系列实战手册——15-60集全流程" },
+      { "file": "knowledge/series-tracker-template.md", "name": "系列追踪表模板" }
     ],
     "caseStudies": [
       { "file": "knowledge/case-studies/wasteland-fight.md", "name": "废土刺杀——完整管线复盘" },
@@ -64,9 +66,10 @@
   "chains": {
     "description": "端到端Prompt Chain——在OpenClaw中依次发送",
     "entries": [
-      { "file": "chains/full-short-drama.chain", "name": "完整短剧生产线", "steps": 8 },
-      { "file": "chains/full-manga.chain", "name": "完整漫剧生产线", "steps": 7 },
-      { "file": "chains/full-film.chain", "name": "完整电影短篇生产线", "steps": 7 }
+      { "file": "chains/full-short-drama.chain", "name": "完整短剧生产线", "steps": 8, "scope": "单集" },
+      { "file": "chains/series-short-drama.chain", "name": "系列短剧生产线", "steps": 5, "scope": "多集系列", "features": ["参数驱动时长(60s-180s)", "系列初始化", "整季追踪", "分段策略自适应"] },
+      { "file": "chains/full-manga.chain", "name": "完整漫剧生产线", "steps": 7, "scope": "单集" },
+      { "file": "chains/full-film.chain", "name": "完整电影短篇生产线", "steps": 7, "scope": "单集" }
     ]
   },
 
