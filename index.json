@@ -59,7 +59,8 @@
     "caseStudies": [
       { "file": "knowledge/case-studies/wasteland-fight.md", "name": "废土刺杀——完整管线复盘" },
       { "file": "knowledge/case-studies/xianxia-duel.md", "name": "古庙仙侠对峙——风格引擎复用" },
-      { "file": "knowledge/case-studies/xianzun-delivery/", "name": "仙尊外卖——完整8步链产出（含剧本/审核/角色/场景/道具/分镜/Seedance/后期）", "steps": 8 }
+      { "file": "knowledge/case-studies/xianzun-delivery/", "name": "仙尊外卖——完整8步链产出（含剧本/审核/角色/场景/道具/分镜/Seedance/后期）", "steps": 8 },
+      { "file": "knowledge/case-studies/canguang-lu/", "name": "残光录第1集——3分钟赛博悬疑漫剧完整8步链（含18种视觉风格预设/22Cut分镜/3段Seedance/后期方案）", "steps": 8, "duration": "180s" }
     ]
   },
 
