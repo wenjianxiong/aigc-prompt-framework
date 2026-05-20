@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIGC 提示词工坊 v1.0</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --card: #161b22;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --dim: #8b949e;
+  --accent: #c9a44b;
+  --accent2: #58a6ff;
+  --green: #3fb950;
+  --red: #f85149;
+  --orange: #d2991d;
+  --purple: #a371f7;
+}
+* { box-sizing:border-box; margin:0; padding:0 }
+body { background:var(--bg); color:var(--text); font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; min-height:100vh }
+a { color:var(--accent2) }
+header { background:var(--card); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:10 }
+.logo { font-size:20px; font-weight:700; color:var(--accent) }
+.ver { font-size:11px; color:var(--dim); background:var(--border); padding:2px 8px; border-radius:10px }
+.nav { display:flex; gap:4px; margin-left:auto }
+.nav button { background:none; border:1px solid var(--border); color:var(--dim); padding:6px 16px; border-radius:6px; cursor:pointer; font-size:13px; transition:.15s }
+.nav button.active { background:var(--accent2); border-color:var(--accent2); color:#fff }
+.nav button:hover:not(.active) { color:var(--text); border-color:var(--text) }
+main { max-width:1400px; margin:0 auto; padding:24px }
+.step { margin-bottom:32px }
+.step h3 { font-size:15px; color:var(--accent2); margin-bottom:12px; display:flex; align-items:center; gap:8px }
+.step h3 .num { display:inline-flex; width:24px; height:24px; align-items:center; justify-content:center; background:var(--accent2); color:#fff; border-radius:12px; font-size:12px; font-weight:700 }
+.cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px }
+.card { background:var(--card); border:2px solid var(--border); border-radius:10px; padding:16px; cursor:pointer; transition:all .2s; position:relative }
+.card:hover { border-color:var(--accent2); transform:translateY(-1px) }
+.card.selected { border-color:var(--green); background:#0d2b1a }
+.card .name { font-weight:600; font-size:14px; margin-bottom:4px }
+.card .desc { font-size:12px; color:var(--dim); line-height:1.5 }
+.card .tag { display:inline-block; padding:1px 8px; border-radius:4px; font-size:11px; margin-top:6px }
+.card .tag.style { background:#1a1a2e; color:var(--accent) }
+.card .tag.light { background:#2e1a1a; color:var(--orange) }
+.card .tag.lens { background:#1a2e1a; color:var(--green) }
+.card .check { display:none; position:absolute; top:8px; right:12px; font-size:18px }
+.card.selected .check { display:block; color:var(--green) }
+
+/* Form */
+.form-group { margin-bottom:16px }
+.form-group label { display:block; font-size:13px; font-weight:600; color:var(--accent2); margin-bottom:6px }
+.form-group textarea, .form-group input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text); font:inherit; resize:vertical; transition:.15s }
+.form-group textarea:focus, .form-group input:focus { outline:none; border-color:var(--accent2) }
+.form-group textarea { min-height:80px }
+.form-group .hint { font-size:11px; color:var(--dim); margin-top:4px }
+
+/* Output */
+.output { background:var(--card); border:2px solid var(--accent); border-radius:12px; padding:24px; margin-top:24px }
+.output h3 { color:var(--accent); margin-bottom:16px; font-size:16px }
+.output pre { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:20px; font-size:13px; line-height:1.8; white-space:pre-wrap; word-break:break-word; overflow-x:auto; max-height:500px; overflow-y:auto }
+.toolbar { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap }
+.btn { padding:10px 22px; border:none; border-radius:8px; font:600 13px inherit; cursor:pointer; transition:.15s }
+.btn-copy { background:var(--green); color:#000 }
+.btn-copy:hover { filter:brightness(1.15) }
+.btn-reset { background:var(--border); color:var(--text) }
+.btn-reset:hover { background:var(--dim) }
+.btn-gh { background:transparent; border:1px solid var(--accent2); color:var(--accent2) }
+.btn-gh:hover { background:rgba(88,166,255,0.1) }
+
+/* Color swatch */
+.swatches { display:flex; gap:6px; margin-top:8px }
+.swatch { width:22px; height:22px; border-radius:4px; border:1px solid rgba(255,255,255,.1) }
+
+/* Summary bar */
+.summary { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px }
+.summary .sel { background:var(--bg); border:1px solid var(--border); padding:3px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:4px }
+.summary .sel .dot { width:8px; height:8px; border-radius:4px }
+.summary .empty { color:var(--dim); font-style:italic }
+
+/* Tabs */
+.tab { display:none }
+.tab.active { display:block }
+
+/* Responsive */
+@media (max-width:768px) {
+  .cards { grid-template-columns:1fr }
+  header { padding:10px 16px }
+  .logo { font-size:17px }
+  main { padding:16px }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎬 AIGC 提示词工坊</div>
+  <span class="ver">v1.0</span>
+  <div class="nav">
+    <button id="btnTabEngine" class="active">⚙️ 选参</button>
+    <button id="btnTabGenerate">✨ 生成</button>
+  </div>
+</header>
+
+<main>
+
+<!-- Summary Bar -->
+<div class="summary" id="summary">
+  <span class="empty" id="summaryText">👆 点击下方卡片选择参数</span>
+</div>
+
+<!-- Tab: Engine -->
+<div class="tab active" id="tabEngine">
+
+<!-- Step 1: 类型 -->
+<div class="step">
+  <h3><span class="num">1</span> 故事类型</h3>
+  <div class="cards" id="genres"></div>
+</div>
+
+<!-- Step 2: 风格 -->
+<div class="step">
+  <h3><span class="num">2</span> 视觉风格</h3>
+  <div class="cards" id="styles"></div>
+</div>
+
+<!-- Step 3: 光影 -->
+<div class="step">
+  <h3><span class="num">3</span> 光影方案</h3>
+  <div class="cards" id="lightings"></div>
+</div>
+
+<!-- Step 4: 镜头 -->
+<div class="step">
+  <h3><span class="num">4</span> 镜头规格</h3>
+  <div class="cards" id="lenses"></div>
+</div>
+
+<!-- Step 5: 质感 -->
+<div class="step">
+  <h3><span class="num">5</span> 质感描述</h3>
+  <div class="cards" id="textures"></div>
+</div>
+
+</div><!-- /tabEngine -->
+
+<!-- Tab: Generate -->
+<div class="tab" id="tabGenerate">
+  <div class="step">
+    <h3><span class="num">6</span> 填写创作内容</h3>
+
+    <div class="form-group">
+      <label>主体描述</label>
+      <input id="inSubject" placeholder="例：一位身穿青色道袍的年轻女修士，黑色长发及腰">
+      <span class="hint">画面核心是谁/什么——外貌、服装、标志特征</span>
+    </div>
+
+    <div class="form-group">
+      <label>动作描述</label>
+      <input id="inAction" placeholder="例：她站在古庙汉白玉台阶前，双掌合十，体内爆发出金色罡气">
+      <span class="hint">此时此刻正在发生什么——具体物理动作</span>
+    </div>
+
+    <div class="form-group">
+      <label>场景描述</label>
+      <input id="inScene" placeholder="例：深山古庙建筑群，汉白玉台阶通向大殿，殿内烛火摇曳">
+      <span class="hint">在哪里——环境、时间、氛围</span>
+    </div>
+
+    <div class="form-group">
+      <label>台词（可选）</label>
+      <input id="inDialog" placeholder="例：一剑破万法。（冷冽，极轻）">
+      <span class="hint">角色说的关键台词 + 语气。单句 ≤15字</span>
+    </div>
+
+    <div class="form-group">
+      <label>@引用映射（可选）</label>
+      <textarea id="inRefs" placeholder="例：&#10;@Image1: 女主三视图&#10;@Image2: 场景设定图&#10;@Image3: 道具参考"></textarea>
+      <span class="hint">上传到 Seedance 的素材引用，格式：@Image1: 用途</span>
+    </div>
+
+    <div class="form-group">
+      <label>负面提示词（可选追加，默认已有基础版）</label>
+      <input id="inNegative" placeholder="例：3D渲染感、写实皮肤">
+    </div>
+
+    <button class="btn btn-copy" id="btnGenerate" style="font-size:16px;padding:14px 40px">🚀 生成提示词</button>
+  </div>
+
+  <div class="output" id="outputBox" style="display:none">
+    <h3>📋 生成结果</h3>
+    <pre id="outputText"></pre>
+    <div class="toolbar">
+      <button class="btn btn-copy" id="btnCopy">📋 一键复制</button>
+      <button class="btn btn-reset" id="btnClear">🔄 清空全部</button>
+    </div>
+  </div>
+</div><!-- /tabGenerate -->
+
+</main>
+
+<script>
+// ====== DATA ======
+const genres = [
+  { id:"urban",name:"都市逆袭",desc:"从底层翻身的快感 · 每15s一个打脸点",light:"伦勃朗布光",tag:"金牌类型"},
+  { id:"rebirth",name:"重生复仇",desc:"前世冤屈今生清算 · 前世冷蓝调 / 今生暖金",light:"冷蓝→暖金"},
+  { id:"son-in-law",name:"赘婿逆袭",desc:"被轻视者的翻身 · 前期压抑后期黄金",light:"阴天→黄金"},
+  { id:"romance",name:"甜宠",desc:"被极致偏爱的甜蜜 · 暖调柔光为主",light:"暖调柔光"},
+  { id:"suspense",name:"悬疑推理",desc:"想知道真相的焦虑 · 大面暗部留白",light:"低调光悬疑"},
+  { id:"horror",name:"恐怖惊悚",desc:"可控的恐惧 · 极暗环境+安全感的建立再打破",light:"月光/手电光"},
+  { id:"scifi",name:"科幻",desc:"对未来的惊叹或警惕 · 冷调科技蓝+暖色生命光",light:"赛博霓虹"},
+  { id:"wasteland",name:"废土末世",desc:"荒芜中寻找希望 · 暖橙脏光+锈铁冷青",light:"废土苍凉光"},
+  { id:"xianxia",name:"修仙",desc:"快意恩仇的浪漫 · 神圣感+暗部史诗感",light:"伦勃朗布光"},
+  { id:"system",name:"系统流",desc:"规则外挂的快感 · 依世界观背景定",light:"依世界观"},
+  { id:"school",name:"校园青春",desc:"怀念的少年时光 · 阴天柔光+黄金+蓝调",light:"阴天柔光"},
+  { id:"rules-horror",name:"规则怪谈",desc:"打破规则的禁忌快感 · 不自然平静的光",light:"无影冷白"},
+  { id:"brainhole",name:"脑洞",desc:"意想不到的快乐 · 光源不限越跳越好",light:"不限"},
+  { id:"big-heroine",name:"大女主",desc:"女性力量觉醒 · 压抑→觉醒→独立三阶段光",light:"阴天→黄金→伦勃朗"},
+];
+const styles = [
+  // 真人电影类
+  { id:"cinematic-real",cat:"真人",name:"真人电影感写实",desc:"超写实电影质感 · 伦勃朗/黄金时刻 · 85mm变形宽银幕 f/1.8 · 原生实拍原片",colors:["#c9a44b","#8b7355","#3d2b1f","#1a1a2e"]},
+  { id:"naturalism",cat:"真人",name:"自然主义纪实",desc:"去表演化真实感 · 自然光为主 · 35mm纪实 · 手持跟拍呼吸感",colors:["#d4c5a8","#8b8378","#5a5a4a","#2e2e2a"]},
+  { id:"commercial",cat:"真人",name:"商业广告质感",desc:"高光干净通透 · 柔和棚拍布光+微暖底色 · 100mm微距+浅景深 · 专业级产品摄影",colors:["#f5f0e8","#d4c5b8","#8b7b6b","#4a4a4a"]},
+  { id:"lowkey",cat:"真人",name:"低调光悬疑",desc:"极暗环境+单一硬光源 · 手电/月光/屏幕光 · 大面暗部 · 锐利阴影",colors:["#1a1a2e","#0d0d1a","#4a3a2a","#0a0a0a"]},
+  { id:"noir",cat:"真人",name:"黑色电影",desc:"极暗环境+高反阴影 · 百叶窗/雨夜/烟雾 · 黑白高反差 · 8K超清",colors:["#0a0a0a","#2a2a2a","#5a5a5a","#f0f0f0"]},
+  { id:"cyberpunk",cat:"真人",name:"霓虹赛博",desc:"蓝紫冷调主光+暖橙霓虹辅光 · 雨水/蒸汽/全息 · 鱼眼/超广角",colors:["#ff00ff","#00ffff","#1a0a2e","#ff6600"]},
+  { id:"retro-film",cat:"真人",name:"复古胶片",desc:"柯达/富士胶片色调 · 颗粒+漏光+柔焦 · 35mm+50mm · 宝丽来拍立得感",colors:["#e8c8a0","#c8a878","#8b6b4b","#2e1a0a"]},
+  { id:"surreal",cat:"真人",name:"超现实电影",desc:"打破物理常规 · 反重力+悖论空间 · 不自然色彩组合 · 梦境逻辑",colors:["#ff4488","#44ff88","#8844ff","#ffaa00"]},
+  // 动画类
+  { id:"3d-real",cat:"动画",name:"3D写实动画",desc:"Pixar级写实CG · 物理级PBR材质 · 体积光 · 85mm变形宽银幕 · 8K渲染",colors:["#5a9ecc","#8bc4a0","#d4a878","#3a5a8a"]},
+  { id:"3d-toon",cat:"动画",name:"3D卡通电影",desc:"迪士尼/Illumination · 风格化材质 · 弹性动画 · 柔和全局光 · 色彩鲜艳",colors:["#ff6b8a","#6bff8a","#ffaa44","#8844ff"]},
+  { id:"clay",cat:"动画",name:"3D黏土质感",desc:"Aardman定格动画质感 · 黏土/橡皮泥肌理 · 实体模型光 · 微距镜头",colors:["#c4a060","#8b6b40","#d4a878","#6b8b6b"]},
+  { id:"2d-hand",cat:"动画",name:"2D手绘电影",desc:"全手绘赛璐珞动画 · 水彩/水粉肌理 · 逐帧动画光感",colors:["#4a8bc4","#c4a060","#e8d4c4","#2a4a6b"]},
+  { id:"2d-flat",cat:"动画",name:"2D扁平插画",desc:"矢量扁平化 · 纯色块+渐变 · 几何构成 · UI/UX风格 · 2D运动图形",colors:["#ff6b6b","#4a8bc4","#ffd93d","#6bc44a"]},
+  { id:"anime",cat:"动画",name:"日系动画",desc:"新海诚/京阿尼级着色 · 柔和光线+发丝光泽 · 8K渲染 · 华丽粒子特效",colors:["#87ceeb","#ffb6c1","#98fb98","#dda0dd"]},
+  { id:"chinese",cat:"动画",name:"国风动画",desc:"中国动画学派着色+散点透视光影 · 水墨/重彩/壁画底 · 留白美学",colors:["#c41e2a","#8b4513","#2e8b57","#daa520"]},
+  { id:"western",cat:"动画",name:"欧美卡通",desc:"Cartoon Network/Nickelodeon · 粗线条+纯色 · 弹性夸张形变",colors:["#ff4444","#44ff44","#ffaa00","#8844ff"]},
+  { id:"picture-book",cat:"动画",name:"绘本动画",desc:"绘本/图画书质感 · 蜡笔/彩铅/水彩肌理 · 温暖怀旧光 · 静帧翻页叙事",colors:["#e8c8a0","#c8b898","#d4a878","#a0c8d4"]},
+  { id:"stop-motion",cat:"动画",name:"定格动画",desc:"实体逐帧动画质感 · 木偶/布偶/纸偶 · 实体布光微距 · 微妙不完美",colors:["#8b6b4b","#c4a060","#d4b896","#6b4b3a"]},
+];
+const lightings = [
+  { id:"rembrandt",name:"伦勃朗布光",desc:"45°暖金主光+面部三角光斑 · 暗部暖棕 · f/2.8 · 85mm",colors:["#c9a44b","#8b7355","#3d2b1f","#2a1a0a"]},
+  { id:"golden",name:"黄金时刻",desc:"暖橙色夕阳光45°射入 · 暗部暖棕 · 长影拖曳 · f/2.8",colors:["#f0a040","#e8c878","#a06830","#4a2a1a"]},
+  { id:"blue-hour",name:"蓝调时刻",desc:"深蓝天空+微暖地平线 · 人工光点 · 孤独/沉思 · f/1.8",colors:["#1a3a5a","#2a4a8b","#5a6a9b","#e8c8a0"]},
+  { id:"overcast",name:"阴天柔光",desc:"均匀漫射灰白天空 · 柔影 · 压抑+纪实 · 35mm 自然光",colors:["#b8b8c4","#8b8b9b","#5a5a6b","#3a3a4a"]},
+  { id:"hard-sun",name:"硬日光",desc:"正午垂直光 · 刀切硬影 · 沙漠/刑场 · 35mm+ND",colors:["#fff8e0","#d4c8a0","#8b6b40","#2a1a0a"]},
+  { id:"neon",name:"赛博霓虹",desc:"蓝紫冷调为主+暖橙霓虹为辅 · 湿路面反光 · 鱼眼/超广角",colors:["#ff00ff","#00ffff","#ff6600","#1a0a2e"]},
+  { id:"firelight",name:"烛光火光",desc:"暖橙闪烁点光源 · 大面暗部棕色 · 影随火舞 · f/1.4",colors:["#ff8820","#e86810","#8b3a0a","#1a0a00"]},
+  { id:"moonlight",name:"月光",desc:"冷蓝顶光+银白高光 · 极暗环境 · 不安/浪漫 · f/1.4",colors:["#4a6a8b","#2a4a6b","#1a2a4a","#0a1a2e"]},
+  { id:"clinical",name:"无影冷白",desc:"纯净白光 · 零阴影 · 实验室/规则空间 · 35mm · 白色环境",colors:["#f0f0f5","#e0e0ea","#c0c0d0","#a0a0b0"]},
+  { id:"stage",name:"舞台追光",desc:"单一强聚光从上方/侧面打入 · 主角高亮 · 40mm+85mm",colors:["#fff8e0","#e8d8a0","#8b6b40","#0a0a0a"]},
+  { id:"backlight",name:"逆光剪影",desc:"主体黑剪影+背景过曝 · 神圣/孤独/史诗 · f/5.6 · 85mm",colors:["#0a0a0a","#1a1a1a","#f0d8a0","#ffe8c0"]},
+  { id:"wasteland-light",name:"废土苍凉",desc:"暖橙脏光主光+锈铁冷青辅光 · 沙尘散射+低压 · f/2.8 · 50mm",colors:["#d4a060","#8b6b40","#5a4a6b","#3a3a2a"]},
+];
+const lenses = [
+  { id:"85mm-anamorphic",name:"85mm变形宽银幕",desc:"电影默认镜 · 竖椭圆散景 · 水平拉伸压缩 · f/1.8 · 浅景深 · 影视工业标准"},
+  { id:"35mm-doc",name:"35mm纪实",desc:"接近人眼 · 自然透视 · 深景深 · f/2.8-5.6 · 手持跟拍 · 纪录片质感"},
+  { id:"14-24mm-ultrawide",name:"14-24mm超广角",desc:"夸张纵深透视 · 拉长空间 · 建立镜头 · 仰拍史诗感 · f/2.8"},
+  { id:"100mm-macro",name:"100mm微距",desc:"极致细节 · 极浅景深 · 毛孔/虹膜/材质 · f/2.8 · 产品/恐怖特写"},
+  { id:"aerial",name:"航拍俯瞰",desc:"无人机高空俯瞰 · 上帝视角 · 全景 · f/4 · 24mm"},
+  { id:"handheld-tracking",name:"手持跟拍",desc:"肩扛/斯坦尼康 · 呼吸感微晃 · 主观带入 · f/2.8 · 35mm"},
+  { id:"fisheye",name:"鱼眼",desc:"180°畸变 · 夸张弯曲 · 迷幻/不安 · f/2.8 · 8-15mm · 赛博/恐怖"},
+];
+const textures = [
+  { id:"skin-healthy",cat:"皮肤",name:"超写实健康皮肤","desc":"亚洲年轻皮肤·鼻梁T区微油光·毛孔可见·真人纹理"},
+  { id:"skin-aged",cat:"皮肤",name:"中年皮肤质感","desc":"鱼尾纹·眉心竖纹·下颚松弛·毛细血管可见"},
+  { id:"skin-battle",cat:"皮肤",name:"战损皮肤","desc":"血痂+擦伤+疤+尘土·污渍+汗·微肿胀"},
+  { id:"metal-polished",cat:"金属",name:"抛光钢","desc":"镜面高光+拉丝纹理+刃纹+冷调金属反光"},
+  { id:"metal-battle",cat:"金属",name:"战损金属","desc":"锈迹+崩口+凹痕+氧化变色+干涸液体痕"},
+  { id:"metal-tungsten",cat:"金属",name:"钨钢工业合金","desc":"哑光+深灰近黑+环形刀纹+碳纤维编织"},
+  { id:"metal-gold",cat:"金属",name:"暗金/古铜","desc":"哑光不反光·古旧磨损·包浆温润·灵力纹路"},
+  { id:"fabric-silk",cat:"布料",name:"真丝绸缎","desc":"柔滑高光+微皱褶+流动感+光泽随时间变化"},
+  { id:"fabric-cotton",cat:"布料",name:"棉麻素衣","desc":"哑光+微肌理+自然垂坠褶皱+粗纱节"},
+  { id:"fabric-wool",cat:"布料",name:"精纺羊毛","desc":"细密纹理+微毛绒+柔和反光+挺括版型"},
+  { id:"fabric-leather",cat:"布料",name:"植鞣皮革","desc":"天然纹理+使用包浆+哑光+铜扣/缝线细节"},
+  { id:"fabric-tech",cat:"布料",name:"科技战术面料","desc":"哑光+防撕裂格纹+MOLLE织带+速干纹理"},
+  { id:"wood-aged",cat:"自然",name:"老木","desc":"年轮纹理+开裂+虫蛀孔+包浆温润"},
+  { id:"stone-marble",cat:"自然",name:"大理石","desc":"冷调纹理+高光反射+微细裂纹+建筑级"},
+  { id:"jade",cat:"自然",name:"玉石/翡翠","desc":"半透明+内絮+温润光泽+色根过渡"},
+  { id:"bone",cat:"特殊",name:"骨制","desc":"天然骨纹脉络+气孔+包浆光泽·微黄"},
+  { id:"crystal",cat:"特殊",name:"宝石/水晶","desc":"内部裂纹+包裹体+切面反光+火彩闪光"},
+  { id:"rust",cat:"特殊",name:"锈蚀","desc":"多层锈色+剥落+粗糙表面+氧化脉络"},
+  { id:"dust",cat:"特殊",name:"沙尘/灰烬","desc":"表面覆灰+空气微粒散射+Tyndall效应"},
+  { id:"blood",cat:"特殊",name:"血迹","desc":"鲜红(动脉)+暗红(静脉)+干涸黑褐+飞溅轨迹"},
+  { id:"energy",cat:"特殊",name:"灵力/能量光","desc":"半透明内发光+边缘衰减+颜色根据属性变化"},
+  { id:"water",cat:"特殊",name:"水/液体","desc":"表面张力反光+折射+波纹+湿润光泽"},
+];
+
+// ====== STATE ======
+let sel = { genre:null, style:null, lighting:null, lens:null, textures:[] };
+
+// ====== RENDER ======
+function renderCards(containerId, items, key, multi=false) {
+  const el = document.getElementById(containerId);
+  let html = "";
+  for (const item of items) {
+    let catTag = item.cat ? `<span class="tag style">${item.cat}</span>` : '';
+    let swatchesHtml = '';
+    if (item.colors) {
+      swatchesHtml = '<div class="swatches">' + item.colors.map(c => `<div class="swatch" style="background:${c}"></div>`).join('') + '</div>';
+    }
+    const isSelected = multi ? (sel.textures||[]).includes(item.id) : sel[key] === item.id;
+    html += `<div class="card${isSelected?' selected':''}" data-id="${item.id}" data-key="${key}"><div class="check">✓</div><div class="name">${item.name}</div><div class="desc">${item.desc}${swatchesHtml}</div>${catTag}</div>`;
+  }
+  el.innerHTML = html;
+  el.querySelectorAll('.card').forEach(c => c.addEventListener('click', function() {
+    const k = this.dataset.key, id = this.dataset.id;
+    if (multi) {
+      let arr = sel.textures || [];
+      const idx = arr.indexOf(id);
+      if (idx > -1) arr.splice(idx,1); else arr.push(id);
+      sel.textures = arr;
+    } else {
+      sel[k] = (sel[k] === id ? null : id);
+    }
+    renderAll();
+    updateSummary();
+  }));
+}
+
+function renderAll() {
+  renderCards("genres", genres, "genre");
+  renderCards("styles", styles, "style");
+  renderCards("lightings", lightings, "lighting");
+  renderCards("lenses", lenses, "lens");
+  renderCards("textures", textures, "textures", true);
+}
+
+// ====== SUMMARY ======
+function findItem(arr, id) { return arr.find(x=>x.id===id)||null }
+function updateSummary() {
+  const parts = [];
+  if (sel.genre) { const g = findItem(genres, sel.genre); parts.push(`<span class="sel"><span class="dot" style="background:var(--purple)"></span>${g.name}</span>`); }
+  if (sel.style) { const s = findItem(styles, sel.style); parts.push(`<span class="sel"><span class="dot" style="background:var(--accent)"></span>${s.name} <span style="font-size:10px;color:var(--dim)">${s.cat}</span></span>`); }
+  if (sel.lighting) { const l = findItem(lightings, sel.lighting); parts.push(`<span class="sel"><span class="dot" style="background:var(--orange)"></span>${l.name}</span>`); }
+  if (sel.lens) { const ln = findItem(lenses, sel.lens); parts.push(`<span class="sel"><span class="dot" style="background:var(--green)"></span>${ln.name}</span>`); }
+  if (sel.textures && sel.textures.length > 0) {
+    parts.push(`<span class="sel"><span class="dot" style="background:var(--accent2)"></span>${sel.textures.length}种质感</span>`);
+  }
+  document.getElementById("summary").innerHTML = parts.length ? parts.join('') : '<span class="empty">👆 点击下方卡片选择参数</span>';
+}
+
+// ====== GENERATE ======
+function generate() {
+  const subj = document.getElementById("inSubject").value.trim();
+  const action = document.getElementById("inAction").value.trim();
+  const scene = document.getElementById("inScene").value.trim();
+  const dialog = document.getElementById("inDialog").value.trim();
+  const refs = document.getElementById("inRefs").value.trim();
+  const extraNeg = document.getElementById("inNegative").value.trim();
+
+  if (!subj && !action && !scene) {
+    alert("至少填写主体描述、动作描述或场景描述中的一个");
+    return;
+  }
+
+  const s = findItem(styles, sel.style);
+  const l = findItem(lightings, sel.lighting);
+  const ln = findItem(lenses, sel.lens);
+
+  let parts = [];
+
+  // @ references
+  if (refs) {
+    parts.push("/* 📎 素材引用 */");
+    parts.push(refs);
+    parts.push("");
+  }
+
+  parts.push("/* 🎬 Seedance 2.0 提示词 */");
+  parts.push("");
+
+  // Subject + @Reference
+  let mainLine = subj;
+  if (refs && refs.includes("@Image1")) mainLine += "（@Image1 角色参考）";
+  parts.push(mainLine + "，");
+
+  // Action
+  if (action) parts.push(action + "。");
+
+  // Scene
+  if (scene) {
+    if (refs && refs.includes("@Image2")) parts.push(`场景：${scene}（@Image2 场景参考）。`);
+    else parts.push(`场景：${scene}。`);
+  }
+
+  // Lens
+  if (ln) parts.push(ln.name + "，f/1.8。");
+
+  // Lighting
+  if (l) parts.push(l.name + "——" + l.desc.split("·")[0].trim() + "。");
+
+  // Style
+  if (s) parts.push(s.name + "风格——" + s.desc.split("·")[0].trim() + "。");
+
+  // Textures
+  if (sel.textures && sel.textures.length > 0) {
+    const txArr = sel.textures.map(id => findItem(textures, id)).filter(Boolean);
+    parts.push("质感：" + txArr.map(t => t.desc.split("·")[0]).join("；") + "。");
+  }
+
+  parts.push("8K超清，超写实电影质感。");
+  parts.push("");
+
+  // Dialog
+  if (dialog) {
+    parts.push("/* 💬 台词 */");
+    parts.push("台词：" + dialog);
+    parts.push("");
+  }
+
+  // Negative prompt
+  parts.push("/* ⚠️ 负面提示词 */");
+  let negBase = "模糊、低画质、面部变形、多余手指、水印、字幕、logo、ui界面";
+  if (extraNeg) negBase += "、" + extraNeg;
+  parts.push("负面：" + negBase);
+
+  // Params
+  parts.push("");
+  parts.push("/* ⚙️ 参数 */");
+  parts.push("--ar 9:16");
+  parts.push("模式：多镜头叙事（推荐）");
+
+  const output = parts.join("\n");
+  document.getElementById("outputText").textContent = output;
+  document.getElementById("outputBox").style.display = "block";
+  document.getElementById("outputBox").scrollIntoView({ behavior:"smooth" });
+}
+
+// ====== EVENTS ======
+document.getElementById("btnGenerate").addEventListener("click", generate);
+document.getElementById("btnCopy").addEventListener("click", function() {
+  navigator.clipboard.writeText(document.getElementById("outputText").textContent).then(() => {
+    const btn = this; btn.textContent = "✅ 已复制！"; setTimeout(()=>btn.textContent="📋 一键复制",2000);
+  });
+});
+document.getElementById("btnClear").addEventListener("click", function() {
+  sel = { genre:null, style:null, lighting:null, lens:null, textures:[] };
+  ["inSubject","inAction","inScene","inDialog","inRefs","inNegative"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("outputBox").style.display = "none";
+  renderAll(); updateSummary();
+});
+
+// Tabs
+document.getElementById("btnTabEngine").addEventListener("click", function() {
+  this.classList.add("active"); document.getElementById("btnTabGenerate").classList.remove("active");
+  document.getElementById("tabEngine").classList.add("active"); document.getElementById("tabGenerate").classList.remove("active");
+});
+document.getElementById("btnTabGenerate").addEventListener("click", function() {
+  this.classList.add("active"); document.getElementById("btnTabEngine").classList.remove("active");
+  document.getElementById("tabEngine").classList.remove("active"); document.getElementById("tabGenerate").classList.add("active");
+});
+
+// Init
+renderAll();
+</script>
+</body>
+</html>
